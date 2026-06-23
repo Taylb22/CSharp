@@ -36,14 +36,67 @@ void DisplayTable() {
     Console.WriteLine();
 }
 
+bool ValidateWin(int row, int col, byte player) {
+    //Array of tuples for offsets
+    (int r, int c)[] directions =  new[] {
+        (1, 1), (1, 0), (1, -1), (0, 1)
+    };
+
+    //Validation Loop
+    foreach ((int r, int c) tuple in directions) {
+        int count = 1;
+        for (int i = 1; i <= 3; i++) {
+            int Roffset = tuple.r * i;
+            int Coffset = tuple.c * i;
+
+            if (row + Roffset < 0 || row + Roffset > 5 ||
+                col + Coffset < 0 || col + Coffset > 6) {
+                break;
+            }
+
+            if (table[row + Roffset, col + Coffset] != player) {
+                break;
+            }
+
+            ++count;
+        }
+
+        //Opposite Direction
+        for (int i = 1; i <= 3; i++) {
+            int NRoffset = (-tuple.r) * i;
+            int NCoffset = (-tuple.c) * i;
+
+            if (row + NRoffset < 0 || row + NRoffset > 5 ||
+                col + NCoffset < 0 || col + NCoffset > 6) {
+                break;
+            }
+
+            if (table[row + NRoffset, col + NCoffset] != player) {
+                break;
+            }
+
+            ++count;
+        }
+
+        if (count >= 4) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void WaitKey(string msg = "Press any key to try again...") {
+    Console.WriteLine(msg);
+    Console.ReadKey(true);
+}
+
 //Entry Point
 //Instructions
 Console.WriteLine();
 Console.WriteLine("Welcome to the Connect 4 game!");
 Console.WriteLine("Player 1 starts with the blue pieces and player 2 will use the yellow ones.");
-Console.WriteLine("Press any key to start...");
-Console.ReadKey(true);
-
+WaitKey("Press any key to start...");
 
 //Main Loop
 bool isGameOver = false;
@@ -67,8 +120,7 @@ while (true) {
         Console.WriteLine("\nThe choice must be an integer number between 1 and 7...");
         Console.ForegroundColor = ConsoleColor.White;
 
-        Console.WriteLine("Press any key to try again...");
-        Console.ReadKey(true);
+        WaitKey();
         continue;
     }
 
@@ -90,65 +142,14 @@ while (true) {
     if (!IsValid) {
         Console.WriteLine("\nThe Column is full...");
         Console.WriteLine("Choose another column");
-        Console.WriteLine("Press any key to try again...");
-        Console.ReadKey(true);
-        //continue;
-        break;
+        WaitKey();
+        continue;
     }
 
     table[row, col] = player;
-
-    //Array of tuples for offsets
-    (int r, int c)[] directions =  new[] {
-        (1, 1), (1, 0), (1, -1), (0, 1)
-    };
     
     //Validate Win
-    foreach ((int r, int c) tuple in directions) {
-        int count = 1;
-        for (int i = 1; i <= 3; i++) {
-            int Roffset = tuple.r * i;
-            int Coffset = tuple.c * i;
-
-            if (row + Roffset < 0 || row + Roffset > 5 ||
-                col + Coffset < 0 || col + Coffset > 6) {
-                break;
-            }
-
-            if (table[row + Roffset, col + Coffset] != player) {
-                break;
-            }
-
-            ++count;
-        }
-        
-        if (count == 4) {
-            isGameOver = true;
-            break;
-        }
-
-        //Opposite Direction
-        for (int i = 1; i <= 3; i++) {
-            int NRoffset = (-tuple.r) * i;
-            int NCoffset = (-tuple.c) * i;
-
-            if (row + NRoffset < 0 || row + NRoffset > 5 ||
-                col + NCoffset < 0 || col + NCoffset > 6) {
-                break;
-            }
-
-            if (table[row + NRoffset, col + NCoffset] != player) {
-                break;
-            }
-
-            ++count;
-        }
-
-        if (count >= 4) {
-            isGameOver = true;
-            break;
-        }
-    }
+    isGameOver = ValidateWin(row, col, player);
 
     //End Game
     if(isGameOver) {
@@ -168,9 +169,5 @@ while (true) {
     ++rounds;
 
     //Switch Players
-    if (player == 1) {
-        player = 2;
-    } else {
-        player = 1;
-    }
+    player = (byte) (3 - player);
 }
