@@ -1,4 +1,7 @@
 using System;
+//To-DO:
+//Create packed_data struct (isodd?)
+//Rewrite Code with the struct
 
 void printBinary (byte[] vetor) {
     foreach (byte val in vetor) {
@@ -47,6 +50,7 @@ byte[] decompact(byte[] compactedData, int fillingMode = 0) {
     byte[] result;
     int length;
     int iterate;
+    //HACK to assume it's an odd pack
     if ((byte)(compactedData[compactedData.Length-1] >> 4) == 0) {
         length = (compactedData.Length * 2) - 1;
         iterate = compactedData.Length - 1;
