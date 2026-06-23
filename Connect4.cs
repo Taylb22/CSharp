@@ -46,8 +46,9 @@ Console.ReadKey(true);
 
 
 //Main Loop
-bool isGameOver = true;
+bool isGameOver = false;
 byte player = 1;
+byte rounds = 1;
 while (true) {
     Console.Clear();
     Console.WriteLine($"Player {player}");
@@ -71,11 +72,102 @@ while (true) {
         continue;
     }
 
-    if(isGameOver) {
+    //Indexing user choice
+    col = col - 1;
+   
+    //Veryfing if the column is full and getting the row placement
+    bool IsValid = false;
+    int row = 0;
+    for (int i = 5; i >= 0; i--) {
+        if (table[i, col] == 0) {
+            IsValid = true;
+            row = i;
+            break;
+        }
+    }
+
+    //Validating Column
+    if (!IsValid) {
+        Console.WriteLine("\nThe Column is full...");
+        Console.WriteLine("Choose another column");
+        Console.WriteLine("Press any key to try again...");
+        Console.ReadKey(true);
+        //continue;
         break;
     }
 
+    table[row, col] = player;
 
+    //Array of tuples for offsets
+    (int r, int c)[] directions =  new[] {
+        (1, 1), (1, 0), (1, -1), (0, 1)
+    };
+    
+    //Validate Win
+    foreach ((int r, int c) tuple in directions) {
+        int count = 1;
+        for (int i = 1; i <= 3; i++) {
+            int Roffset = tuple.r * i;
+            int Coffset = tuple.c * i;
+
+            if (row + Roffset < 0 || row + Roffset > 5 ||
+                col + Coffset < 0 || col + Coffset > 6) {
+                break;
+            }
+
+            if (table[row + Roffset, col + Coffset] != player) {
+                break;
+            }
+
+            ++count;
+        }
+        
+        if (count == 4) {
+            isGameOver = true;
+            break;
+        }
+
+        //Opposite Direction
+        for (int i = 1; i <= 3; i++) {
+            int NRoffset = (-tuple.r) * i;
+            int NCoffset = (-tuple.c) * i;
+
+            if (row + NRoffset < 0 || row + NRoffset > 5 ||
+                col + NCoffset < 0 || col + NCoffset > 6) {
+                break;
+            }
+
+            if (table[row + NRoffset, col + NCoffset] != player) {
+                break;
+            }
+
+            ++count;
+        }
+
+        if (count >= 4) {
+            isGameOver = true;
+            break;
+        }
+    }
+
+    //End Game
+    if(isGameOver) {
+        Console.Clear();
+        DisplayTable();
+        Console.WriteLine($"Player {player} won!!!");
+        break;
+    }
+
+    //Board is Full
+    if (rounds == (6 * 7)) {
+        Console.Clear();
+        DisplayTable();
+        Console.WriteLine("Draw!!!");
+        break;
+    }
+    ++rounds;
+
+    //Switch Players
     if (player == 1) {
         player = 2;
     } else {
