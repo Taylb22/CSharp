@@ -139,7 +139,7 @@ while (!IsGameOver) {
 
 		//Collisions
 		bool upWall = (NewHead < 0);
-		bool downWall = (NewHead > ROWS * COLUMNS);
+		bool downWall = (NewHead >= ROWS * COLUMNS);
 		bool rigthWall = ((direction == 1) && (NewHead % COLUMNS < Snake[0] % COLUMNS));
 		bool leftWall = ((direction == -1) && (NewHead % COLUMNS > Snake[0] % COLUMNS));
 
